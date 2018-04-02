@@ -33,12 +33,6 @@ struct comparator {
     int dim;
 };
 
-// bool comparator (vector<double> i, vector<double> j, int dimension)
-// {
-// 	return (i[dimension]<j[dimension]);
-// }
-
-
 points sortPoints(points list, int dimension)
 {
 	sort(list.begin(), list.end(), comparator(dimension));
