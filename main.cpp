@@ -345,6 +345,31 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 }
 
 
+void write_result(priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set)
+{	
+	list<pnt> result;
+	int dim = answer_set.top().first.size();
+	while(!answer_set.empty())
+	{
+		result.push_back(answer_set.top().first);
+		answer_set.pop();
+	}
+
+	ofstream results_file;
+	results_file.open("results.txt");
+	for (int i = 0; i < answer_set.size(); ++i)
+	{
+		vector<double> res = result.back();
+		for (int j = 0; i < dim; ++i)
+		{
+			results_file<< res[j]<<" ";
+		}
+		result.pop_back();
+		results_file<<"\n";
+	}
+	return;
+}
+
 // Read data points from dataset.txt
 points readData(string dataset_file)
 {
