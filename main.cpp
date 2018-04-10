@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <queue>
+#include <chrono>
 
 using namespace std;
 
@@ -311,6 +312,29 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 }
 
 
+
+priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> kNN_sequential_scan(int k, pnt& query_point, intNode* head, points& all_points)
+{
+	priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set;
+	for (int i = 0; i < k; ++i)
+	{
+		answer_set.push(make_pair(all_points[i], distance_from_point(query_point, all_points[i])));
+	}
+	for (int i = k; i < all_points.size(); ++i)
+	{	
+		double dist = distance_from_point(query_point, all_points[i]);
+		if (answer_set.top().second > dist)
+		{
+			answer_set.pop();
+			answer_set.push(make_pair(all_points[i], dist));
+		}
+	}
+
+	return answer_set;
+
+}
+
+
 // Read data points from dataset.txt
 points readData(string dataset_file)
 {
@@ -357,6 +381,12 @@ points readData(string dataset_file)
 }
 
 
+// void write_answer_set(priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set)
+// {	
+	
+// }
+
+
 int main(int argc, char* argv[]) {
 
 	// char* dataset_file = argv[1];
@@ -375,13 +405,26 @@ int main(int argc, char* argv[]) {
 	v2.push_back(1);
 	cout<< "distance: "<<distance_from_point(v1, v2)<<endl;
 	priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set;
+	priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set_2;
+	auto start = std::chrono::system_clock::now();
 	answer_set =  kNN_bestfirst(2, v1, mykdtree.root, all_points);
+	auto end = std::chrono::system_clock::now();
+	answer_set_2 =  kNN_sequential_scan(2, v1, mykdtree.root, all_points);
 	while(!answer_set.empty())
 	{
 		cout<<answer_set.top().second<<endl;
 		answer_set.pop();
 	}
-	cout<< "kNN run kiya humne yayy"<<endl;
+	cout<<endl;
+	while(!answer_set_2.empty())
+	{
+		cout<<answer_set_2.top().second<<endl;
+		answer_set_2.pop();
+	}
+
+	std::chrono::duration<double> elapsed_seconds = end-start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+    cout<< "Elapsed time: " << elapsed_seconds.count() << "s\n";
 	// for (int i = 0; i< all_points.size();i++){
 	// 	cout<<distance_from_point(v1,all_points[i])<<endl;
 	// }
