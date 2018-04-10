@@ -1,14 +1,28 @@
 import os,random
 import numpy as np
+import sys
 
 output_dataset_file = 'dataset.txt'
-output_query_file = 'query.txt'
+output_queries = 'query.txt'
+output_query_file = 'query_final.txt'
 
-dimension = 5
-numPoints = 1000
+if len(sys.argv) != 4:
+	print("Invalid Format")
+	print("python file_generator.py <dimension> <numPoints> <numQueryPoints>")
+	exit()
+
+dimension = int(sys.argv[1])
+numPoints = int(sys.argv[2])
+numQueryPoints = int(sys.argv[3])
 
 if os.path.exists(output_dataset_file):
 	os.remove(output_dataset_file)
+
+if os.path.exists(output_queries):
+	os.remove(output_queries)
+
+if os.path.exists(output_query_file):
+	os.remove(output_query_file)
 
 dim_wise_factorial = []
 
@@ -24,6 +38,17 @@ with open(output_dataset_file,'w+') as outFile:
 		s = ''
 		for j in range(dimension):
 			s = s + str(round(dim_wise_factorial[j][i],3)) + ' '
+		s = s + '\n'
+		# print(s)
+		outFile.write(s)
+
+with open(output_queries,'w+') as outFile:
+	s = str(dimension) +' '+ str(numQueryPoints) +'\n'
+	outFile.write(s)
+	for i in range(numQueryPoints):
+		s = ''
+		for j in range(dimension):
+			s = s + str(round(random.random(),3)) + ' '
 		s = s + '\n'
 		# print(s)
 		outFile.write(s)
