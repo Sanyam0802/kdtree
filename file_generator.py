@@ -1,6 +1,6 @@
 import os,random
 import numpy as np
-import sys
+import sys, math
 
 output_dataset_file = 'dataset.txt'
 output_queries = 'query.txt'
@@ -28,16 +28,19 @@ dim_wise_factorial = []
 
 for j in range(dimension):
 	dim_wise_factorial.append(np.random.choice(numPoints,numPoints,replace = False)/numPoints)
+# print(len(dim_wise_factorial[0]))
 
 # print(dim_wise_factorial)
 
 with open(output_dataset_file,'w+') as outFile:
 	s = str(dimension) +' '+ str(numPoints) +'\n'
 	outFile.write(s)
+	round_range = math.ceil(math.log10(numPoints))
+	# print(round_range)
 	for i in range(numPoints):
 		s = ''
 		for j in range(dimension):
-			s = s + str(round(dim_wise_factorial[j][i],3)) + ' '
+			s = s + str(round(dim_wise_factorial[j][i],round_range)) + ' '
 		s = s + '\n'
 		# print(s)
 		outFile.write(s)
