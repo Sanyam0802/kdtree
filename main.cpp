@@ -7,6 +7,7 @@
 #include <sstream>
 #include <queue>
 #include <chrono>
+#include <list>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ struct intNode
 	intNode * l_intNode;
 	intNode * r_intNode;
 	points MBR;					//two points to define the rectangle(MBR)
+	bool not_null = true;
 	
 };
 
@@ -77,7 +79,7 @@ public:
 			sorted_lists.push_back(sortPoints(all_data, i));
 		intNode* head = new intNode;		
 		points rect;
-		cout<<"sorted"<<endl;
+		// cout<<"sorted"<<endl;
 		for (int i = 0; i < 2; ++i)
 		{
 			pnt new_pnt;
@@ -93,19 +95,30 @@ public:
 
 		head->MBR = rect;
 		buildTree(sorted_lists, head, 0, rect);
-		cout<<"hope it reaches here"<<endl;
+		// cout<<"hope it reaches here"<<endl;
 		root = head;
 		sorted_lists.clear();
 		sorted_lists.shrink_to_fit();
 		return;
 	}
 
-// Build the KD-tree
+	// Build the KD-tree
 	void buildTree(list_points &sorted_lists, intNode* head, int level, points &rect)
 	{
 		//find median of levelth list -> access the size/2th element -> levelth 
+		// cout<<sorted_lists[level].size()<<endl;
+
+		if (sorted_lists[level].size()==0)
+		{
+			head->not_null = false;
+			head->is_leaf = false;
+			// cout<<"eawda"<<endl;
+			return;
+		}
+
 		if (sorted_lists[level].size()==1)
 		{
+			// cout<<"calledddd"<<endl;
 			head->data_full_point = sorted_lists[0][0];
 			head->is_leaf=true;
 			head->data_median = sorted_lists[0][0][level];
@@ -129,6 +142,8 @@ public:
 		head->is_leaf=false;
 		head->MBR = rect;
 		head->level = level;
+		// cout<<"called"<<endl;
+
 		// cout<<median<<endl;
 		// printPoints(head->MBR);
 		// cout<<endl;
@@ -256,8 +271,6 @@ struct comparator_min_heap {
     }
 };
 
-
-
 // KNN query - best first
 priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> kNN_bestfirst(int k, pnt& query_point, intNode* head, points& all_points)
 {
@@ -277,7 +290,10 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 	{
 		answer_set.push(make_pair(all_points[i], distance_from_point(query_point, all_points[i])));
 	}
+	
+	
 	head->dist_to_query = distance_from_mbr(query_point, head->MBR);
+
 	candidate.push(head);
 	// cout<<"WHILE . . . "<<endl;
 	while(!candidate.empty() && (candidate.top()->dist_to_query < answer_set.top().second) )
@@ -300,10 +316,19 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 			intNode* leftChild = top_MBR->l_intNode;
 			intNode* rightChild = top_MBR->r_intNode;
 			// cout<<"defined l, r child"<<endl;
-			double left_distance = distance_from_mbr(query_point, leftChild->MBR);
+			double right_distance;
+			if (rightChild->not_null == false){
+				// cout<<"yaya"<<endl;
+				right_distance = std::numeric_limits<float>::infinity();
+			}
+			else
+				right_distance = distance_from_mbr(query_point, rightChild->MBR);
 			// cout<<". . "<<endl;
-			double right_distance = distance_from_mbr(query_point, rightChild->MBR);
+			double left_distance = distance_from_mbr(query_point, leftChild->MBR);
 			// cout<<"calculated distance of left and right MBRs from query_point"<<endl;
+
+			
+
 			leftChild->dist_to_query = left_distance;
 			rightChild->dist_to_query = right_distance;
 			// cout<<"set dist_to_query"<<endl;
@@ -344,31 +369,6 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 
 }
 
-
-void write_result(priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set)
-{	
-	list<pnt> result;
-	int dim = answer_set.top().first.size();
-	while(!answer_set.empty())
-	{
-		result.push_back(answer_set.top().first);
-		answer_set.pop();
-	}
-
-	ofstream results_file;
-	results_file.open("results.txt");
-	for (int i = 0; i < answer_set.size(); ++i)
-	{
-		vector<double> res = result.back();
-		for (int j = 0; i < dim; ++i)
-		{
-			results_file<< res[j]<<" ";
-		}
-		result.pop_back();
-		results_file<<"\n";
-	}
-	return;
-}
 
 // Read data points from dataset.txt
 points readData(string dataset_file)
@@ -415,6 +415,30 @@ points readData(string dataset_file)
     return all_points;
 }
 
+void write_result(priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set)
+{	
+	list<pnt> result;
+	int dim = answer_set.top().first.size();
+	while(!answer_set.empty())
+	{
+		result.push_back(answer_set.top().first);
+		answer_set.pop();
+	}
+
+	ofstream results_file;
+	results_file.open("results.txt");
+	for (int i = 0; i < answer_set.size(); ++i)
+	{
+		vector<double> res = result.back();
+		for (int j = 0; i < dim; ++i)
+		{
+			results_file<< res[j]<<" ";
+		}
+		result.pop_back();
+		results_file<<"\n";
+	}
+	return;
+}
 
 int main(int argc, char* argv[]) {
 
@@ -425,59 +449,68 @@ int main(int argc, char* argv[]) {
 
 	// string dataset_file = "dataset.txt";
 	points all_points = readData(dataset_file);
-	points all_query_points = readData(queries_file);
-	cout<<"reached"<<endl;
+	// cout<<"reached"<<endl;
 	// [TODO] Construct kdTree using dataset_file here	
 	kdTree mykdtree(all_points[0].size());
 	mykdtree.buildStart(all_points);
-
+	cout<<"Build tree completed"<<endl;
+	points all_query_points = readData(queries_file);
+	cout<<"points loaded"<<endl;
+	exit(1);
 	priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set;
 
-	// auto start_seq = std::chrono::system_clock::now();
-	// for(int i = 0; i< all_query_points.size();i++)
-	// {
-	// 	// answer_set =  kNN_bestfirst(K, all_query_points[i], mykdtree.root, all_points);
-	// 	answer_set =  kNN_sequential_scan(K, all_query_points[i], mykdtree.root, all_points);
-	// 	while(!answer_set.empty())
-	// 	{
-	// 		cout<<answer_set.top().second<<endl;
-	// 		answer_set.pop();
-	// 	}
-	// 	cout<< "kNN run kiya humne yayy"<<endl<<endl;
+	auto start_seq = std::chrono::system_clock::now();
+	for(int i = 0; i< all_query_points.size();i++)
+	{
+		// answer_set =  kNN_bestfirst(K, all_query_points[i], mykdtree.root, all_points);
+		answer_set =  kNN_sequential_scan(K, all_query_points[i], mykdtree.root, all_points);
+		// while(!answer_set.empty())
+		// {
+		// 	cout<<answer_set.top().second<<endl;
+		// 	answer_set.pop();
+		// }
+		// cout<< "kNN run kiya humne yayy"<<endl<<endl;
 
-	// }
-	// auto end_seq = std::chrono::system_clock::now();
-	// std::chrono::duration<double> elapsed_seconds_seq = end_seq- start_seq;
-	// cout<<K<<" nearest neighbour query"<<endl;
-	// cout<<all_query_points[0].size()<<" dimension"<<endl;
-	// cout<<all_query_points.size()<<" query points"<<endl;
-	// cout<<all_points.size()<<" points in tree construction"<<endl<<endl;
+	}
+	auto end_seq = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed_seconds_seq = end_seq- start_seq;
+	cout<<K<<" nearest neighbour query"<<endl;
+	cout<<all_query_points[0].size()<<" dimension"<<endl;
+	cout<<all_query_points.size()<<" query points"<<endl;
+	cout<<all_points.size()<<" points in tree construction"<<endl<<endl;
 
-	// cout<< "Sequential";
-	// cout<< "Elapsed time: "<<elapsed_seconds_seq.count() << " s"<<endl;
-	// cout<< "Average Elapsed time per query: "<<elapsed_seconds_seq.count()/(1.0*all_query_points.size()) << " s"<<endl;
+	cout<< "Sequential";
+	cout<< "Elapsed time: "<<elapsed_seconds_seq.count() << " s"<<endl;
+	double avg_time_seq = elapsed_seconds_seq.count()/(1.0*all_query_points.size());
+	cout<< "Average Elapsed time per query: "<<avg_time_seq << " s"<<endl;
 
-	// cout<<endl<<endl;
+	cout<<endl<<endl;
 
-	// auto start_best = std::chrono::system_clock::now();
-	// for(int i = 0; i< all_query_points.size();i++)
-	// {
-	// 	answer_set =  kNN_bestfirst(K, all_query_points[i], mykdtree.root, all_points);
-	// 	// answer_set =  kNN_sequential_scan(K, all_query_points[i], mykdtree.root, all_points);
-	// 	// while(!answer_set.empty())
-	// 	// {
-	// 	// 	cout<<answer_set.top().second<<endl;
-	// 	// 	answer_set.pop();
-	// 	// }
-	// 	// cout<< "kNN run kiya humne yayy"<<endl<<endl;
+	auto start_best = std::chrono::system_clock::now();
+	for(int i = 0; i< all_query_points.size();i++)
+	{
+		// for(int j = 0; j < all_query_points[i].size();j++){
+		// 	cout<<all_query_points[i][j]<<' ';
+		// }
+		cout<<i<<endl;
+		answer_set =  kNN_bestfirst(K, all_query_points[i], mykdtree.root, all_points);
+		// answer_set =  kNN_sequential_scan(K, all_query_points[i], mykdtree.root, all_points);
+		// while(!answer_set.empty())
+		// {
+		// 	cout<<answer_set.top().second<<endl;
+		// 	answer_set.pop();
+		// }
+		// cout<< "kNN run kiya humne yayy"<<endl<<endl;
 
-	// }
-	// auto end_best = std::chrono::system_clock::now();
-	// std::chrono::duration<double> elapsed_seconds_best = end_best - start_best;
-	// cout<<"Best First";
-	// cout<< "Elapsed time: "<<elapsed_seconds_best.count() << "s"<<endl;
-	// cout<< "Average Elapsed time per query: "<<elapsed_seconds_best.count()/(1.0*all_query_points.size()) << "s"<<endl;
+	}
+	auto end_best = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed_seconds_best = end_best - start_best;
+	cout<<"Best First";
+	cout<< "Elapsed time: "<<elapsed_seconds_best.count() << "s"<<endl;
+	double avg_time_best = elapsed_seconds_best.count()/(1.0*all_query_points.size());
+	cout<< "Average Elapsed time per query: "<<avg_time_best << "s"<<endl;
 
+	cout<<endl<<"Averge time in seq to best "<<avg_time_seq/avg_time_best<<endl;
 
 	// for (int i = 0; i< all_points.size();i++){
 	// 	cout<<distance_from_point(v1,all_points[i])<<endl;
