@@ -24,27 +24,37 @@ if os.path.exists(output_queries):
 if os.path.exists(output_query_file):
 	os.remove(output_query_file)
 
-# dim_wise_factorial = []
+dim_wise_factorial = []
 
-# for j in range(dimension):
-# 	dim_wise_factorial.append(np.random.choice(numPoints,numPoints,replace = False)/numPoints)
+for j in range(dimension):
+	dim_wise_factorial.append(np.random.choice(numPoints,numPoints,replace = False)/numPoints)
 # print(len(dim_wise_factorial[0]))
 
 # print(dim_wise_factorial)
+
+hash_table = {}
 
 with open(output_dataset_file,'w+') as outFile:
 	s = str(dimension) +' '+ str(numPoints) +'\n'
 	outFile.write(s)
 	round_range = math.ceil(math.log10(numPoints))
 	# print(round_range)
-	for i in range(numPoints):
+	count = 0
+	while (count != numPoints):
 		s = ''
 		for j in range(dimension):
 			# s = s + str(round(dim_wise_factorial[j][i],round_range)) + ' '
 			s = s + str(round(random.uniform(0,1),round_range)) + ' '
 		s = s + '\n'
+		if s in hash_table:
+			continue
+		else:
+			hash_table[s]=1
+			count+=1
+			outFile.write(s)
+
+
 		# print(s)
-		outFile.write(s)
 
 with open(output_queries,'w+') as outFile:
 	s = str(dimension) +' '+ str(numQueryPoints) +'\n'
