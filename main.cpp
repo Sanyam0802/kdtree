@@ -336,18 +336,23 @@ struct comparator_min_heap {
 };
 
 
-bool changeNeeded(int dist_to_p2, pnt p2, priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set){
+bool changeNeeded(double dist_to_p2, pnt p2, priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap> answer_set){
 	if (answer_set.top().second > dist_to_p2)
 	{
+		// cout<<1<<' '<<dist_to_p2<<' '<<answer_set.top().second;
 		return true;
 	}
-	else if (answer_set.top().second == dist_to_p2){
+	else if(answer_set.top().second < dist_to_p2){
+		// cout<<2<<' '<<dist_to_p2<<' '<<answer_set.top().second;
+		return false;
+	}		
+	else{
 		bool isLeft = compare(p2,answer_set.top().first,0);
-		if (isLeft){
+		// cout<<3;
+		if (isLeft)
 			return true;
-		}
+		else return false;
 	}
-	else return false;
 }
 
 // KNN query - best first
@@ -383,7 +388,7 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 		if (top_MBR->is_leaf)
 		{	
 			// cout<<"IF. . "<<endl;
-			int max_dist = answer_set.top().second;
+			double max_dist = answer_set.top().second;
 			pnt p2 = top_MBR->MBR[0];
 			bool isChange = changeNeeded(max_dist,p2,answer_set);
 
@@ -451,6 +456,7 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 	{	
 		double dist = distance_from_point(query_point,all_points[i]);
 		if(changeNeeded(dist,all_points[i],answer_set)){
+			// cout<<i<<' ';
 			answer_set.pop();
 			answer_set.push(make_pair(all_points[i], dist));
 		}
@@ -604,7 +610,14 @@ int main(int argc, char* argv[]) {
 		// }
 		// cout<<i<<endl;
 		answer_set =  kNN_bestfirst(K, all_query_points[i], mykdtree.root, all_points);
-		// answer_set =  kNN_sequential_scan(K, all_query_points[i], mykdtree.root, all_points);
+		// while(!answer_set.empty())
+		// {
+		// 	cout<<answer_set.top().second<<endl;
+		// 	answer_set.pop();
+		// }
+		// cout<< "kNN run kiya humne yayy"<<endl<<endl;
+
+
 		// int j = 0;
 		// double hundred_closest_distance, second_closest_distance;
 		// while(!answer_set.empty())
