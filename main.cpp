@@ -55,7 +55,6 @@ struct comparator {
 points sortPoints(points list, int dimension, int totalDim)
 {	
 	sort(list.begin(), list.end(), comparator(dimension,totalDim));
-	// cout<<"sort points"<<endl;
 	return list;
 }
 
@@ -111,7 +110,6 @@ public:
 			sorted_lists.push_back(sortPoints(all_data, i,dimension));
 		intNode* head = new intNode;		
 		points rect;
-		// cout<<"sorted"<<endl;
 		for (int i = 0; i < 2; ++i)
 		{
 			pnt new_pnt;
@@ -137,14 +135,11 @@ public:
 	void buildTree(list_points &sorted_lists, intNode* head, int level, points &rect)
 	{
 		//find median of levelth list -> access the size/2th element -> levelth 
-		// cout<<sorted_lists[level].size()<<endl;
 
 		if (sorted_lists[level].size()==0)
 		{
-			cout<<"Size of right list has become zero"<<endl;								// REMOVE THISS; DO NOT FORGET
 			head->not_null = false;
 			head->is_leaf = false;
-			// cout<<"eawda"<<endl;
 			return;
 		}
 
@@ -401,7 +396,6 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 	{	
 		double dist = distance_from_point(query_point,all_points[i]);
 		if(changeNeeded(dist,all_points[i],answer_set)){
-			// cout<<i<<' ';
 			answer_set.pop();
 			answer_set.push(make_pair(all_points[i], dist));
 		}
@@ -410,7 +404,6 @@ priority_queue< pair<pnt,double>, vector<pair<pnt,double>>, comparator_max_heap>
 	return answer_set;
 
 }
-
 
 // Read data points from dataset.txt
 points readData(string dataset_file)
