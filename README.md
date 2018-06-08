@@ -1,4 +1,4 @@
-# KdTree-StarterCode
+# KdTree
 
 This repository contains the k-d tree implementation as a part of third assignment in COL362 (Intro. to Database Management Systems) being held at IIT Delhi.
 
@@ -46,6 +46,5 @@ Then for k = 2, results.txt should look like:
 ## Command to run
 
     python parent.py <dataset_file> <query_file> <k>
-parent.py is compatible with Python 2.x and Python 3.x and with both Linux and Windows. However final evaluation will be done using Python 3.x. So, for students using Python in your program, it is recommended to use Python 3.x.
+parent.py is compatible with Python 2.x and Python 3.x and with both Linux and Windows.
 
-For any issues, feel free to post on the Piazza group of this course.
