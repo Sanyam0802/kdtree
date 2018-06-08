@@ -1,6 +1,6 @@
 # KdTree-StarterCode
 
-This repository contains the starter code for the k-d tree assignment in COL362/632 (Intro. to Database Management Systems) being held at IIT Delhi.
+This repository contains the k-d tree implementation as a part of third assignment in COL362 (Intro. to Database Management Systems) being held at IIT Delhi.
 
 The part (d) of the assignment is a competition among all the students based on the time taken by their k-d tree implementation to answer a kNN-query.
  
@@ -15,10 +15,6 @@ In order for parent.py to measure the time taken by your program to just answer 
  3. parent.py would then write the name/path of the **<query_file>** (which contains the query point for kNN - Format specified below) and the value of **k** (k in kNN) on your standard input (stdin). It also starts the timer now.
  4. Your program should now read the name of the <query_file> and the value of k from stdin and process the query using the k-d tree. The output (the k nearest neighbors) should then be written to **results.txt**. (Format specified below)
  5. Your program should then output "1" on stdout so that the parent can stop the timer and check your results.txt.
-
-**Sample code is provided** - run.sh and sample.cpp (and a sample.py, in case you wish to work in Python) - to demonstrate how to communicate with parent.py. Feel free to extend them as you need.
-
-**NOTE**: The stdout and stdin of your program are used for communication with the parent.py. Hence, for any debugging purposes, do not print anything on stdout, instead use stderr (using cerr in C++ for example).
 
 ## File Formats
 
