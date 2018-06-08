@@ -1,8 +1,6 @@
 # KdTree
 
 This repository contains the k-d tree implementation as a part of third assignment in COL362 (Intro. to Database Management Systems) being held at IIT Delhi.
-
-The part (d) of the assignment is a competition among all the students based on the time taken by their k-d tree implementation to answer a kNN-query.
  
 ## Program Structure
 
